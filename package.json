@@ -1,12 +1,14 @@
 {
-  "name": "Clean_arquitecture_react_typescript_TDD",
+  "name": "clean_react",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --open",
-    "test": "jest --no-cache",
-    "test:watch": "npm test -- --watch"
+    "test": "jest --passWithNoTests",
+    "test:watch": "npm test -- --watchAll",
+    "test:staged": "npm test -- --findRelatedTests",
+    "test:ci": "npm test -- --coverage",
+    "start": "webpack-dev-server --open"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +28,7 @@
     "faker": "^4.1.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.0.1",
+    "jest-localstorage-mock": "^2.4.3",
     "node-sass": "^4.14.1",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.2.1",
