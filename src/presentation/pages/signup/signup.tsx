@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import Styles from './signup-styles.scss';
-import { LoginHeader, FormStatus, Footer, Input } from '../../components';
+import { LoginHeader, FormStatus, Footer, Input, SubmitButton } from '../../components';
 import Context from '../../contexts/form/form-context';
 import { Validation } from '../../protocols/validation';
 import { AddAccount } from '../../../domain/usecases/add-account';
+import { SaveAccessToken } from '../../../domain/usecases/save-access-token';
+import { Link, useHistory } from 'react-router-dom';
 
 type Props = {
   validation: Validation,
-  addAccount: AddAccount
+  addAccount: AddAccount,
+  saveAccessToken: SaveAccessToken
 }
 
-const SignUp: React.FC<Props> = ({ validation, addAccount }: Props) => {
+const SignUp: React.FC<Props> = ({ validation, addAccount, saveAccessToken }: Props) => {
+  const history = useHistory();
+  
   const [state, setState] = useState({
     isLoading: false,
+    isFormInvalid: true,
     name: '',
     email: '',
     password: '',
@@ -25,35 +31,46 @@ const SignUp: React.FC<Props> = ({ validation, addAccount }: Props) => {
   });
 
   useEffect(() => {
+    const nameError = validation.validate('name', state.name);
+    const emailError = validation.validate('email', state.email);
+    const passwordError = validation.validate('password', state.password);
+    const passwordConfirmationError = validation.validate('passwordConfirmation', state.passwordConfirmation);
+    
     setState({
       ...state,
-      nameError: validation.validate('name', state.name),
-      emailError: validation.validate('email', state.email),
-      passwordError: validation.validate('password', state.password),
-      passwordConfirmationError: validation.validate('passwordConfirmation', state.passwordConfirmation)
-    })
+      nameError,
+      emailError,
+      passwordError,
+      passwordConfirmationError,
+      isFormInvalid: !!nameError || !!emailError || !!passwordError || !!passwordConfirmationError
+    });
   }, [state.name, state.email, state.password, state.passwordConfirmation]);
-
-
-  const handleButtonStatus = (): boolean => {
-    return !!state.nameError || !!state.emailError || !!state.passwordError || !!state.passwordConfirmationError;
-  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    if(state.isLoading) {
-      return;
+    try {
+      if (state.isLoading || state.isFormInvalid) {
+        return;
+      }
+      setState({
+        ...state,
+        isLoading: true
+      });
+      const account = await addAccount.add({
+        name: state.name,
+        email: state.email,
+        password: state.password,
+        passwordConfirmation: state.passwordConfirmation
+      });
+      await saveAccessToken.save(account.accessToken);
+      history.replace('/');
+    } catch (error) {
+      setState({
+        ...state,
+        isLoading: false,
+        mainError: error.message
+      })
     }
-    setState({
-      ...state,
-      isLoading: true
-    });
-    await addAccount.add({
-      name: state.name,
-      email: state.email,
-      password: state.password,
-      passwordConfirmation: state.passwordConfirmation
-    });
   }
 
   return (
@@ -66,9 +83,8 @@ const SignUp: React.FC<Props> = ({ validation, addAccount }: Props) => {
           <Input type="email" name="email" placeholder="Digite seu email" />
           <Input type="password" name="password" placeholder="Digite sua senha" />
           <Input type="password" name="passwordConfirmation" placeholder="Repita sua senha" />
-          <button data-testid="submit" disabled={handleButtonStatus()} className={Styles.submit} type="submit">Entrar</button>
-          {/* <Link to="/login" className={Styles.link}>Voltar para Login</Link> */}
-          <span className={Styles.link}>Voltar para Login</span>
+          <SubmitButton text="Cadastrar" />
+          <Link replace to="/login" data-testid="login-link" className={Styles.link}>Voltar para Login</Link>
           <FormStatus />
         </form>
       </Context.Provider>
