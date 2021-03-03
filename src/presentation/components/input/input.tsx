@@ -26,10 +26,26 @@ const Input: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <div className={Styles.inputWrap}>
-      <input {...props} placeholder="" data-testid={props.name} onChange={handleChange} ref={inputRef} />
-      <label onClick={() => inputRef.current.focus()}>{props.placeholder}</label>
-      <span data-testid={`${props.name}-status`} title={getTitle()} className={Styles.status}>{getStatus()}</span>
+    <div
+      className={Styles.inputWrap}
+      data-status={error ? 'invalid' : 'valid'}
+      data-testid={`${props.name}-wrap`}
+    >
+      <input
+        {...props}
+        placeholder=" "
+        data-testid={props.name}
+        onChange={handleChange}
+        ref={inputRef}
+        title={error}
+      />
+      <label
+        data-testid={`${props.name}-label`}
+        onClick={() => inputRef.current.focus()}
+        title={error}
+      >
+        {props.placeholder}
+      </label>
     </div>
   )
 }

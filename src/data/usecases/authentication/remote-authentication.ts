@@ -8,7 +8,7 @@ import { AccountModel } from "../../../domain/models/accountModel";
 export class RemoteAuthentication implements Authentication {
   constructor(
     private readonly url: string,
-    private readonly httpClient: HttpPostClient<AuthenticationParams, AccountModel>
+    private readonly httpClient: HttpPostClient<AccountModel>
   ) { }
 
   async auth(params: AuthenticationParams): Promise<AccountModel> {
