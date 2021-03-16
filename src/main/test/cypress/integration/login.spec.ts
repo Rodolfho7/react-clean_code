@@ -57,6 +57,6 @@ describe('Login', () => {
     cy.getByTestId('spinner').should('not.exist')
     cy.getByTestId('main-error').should('not.exist')
     cy.url().should('eq', `${baseUrl}/`);
-    cy.window().then((window) => assert.isOk(window.localStorage.getItem('accessToken')));
+    cy.window().then((window) => assert.isOk(window.localStorage.getItem('account')));
   });
 });
