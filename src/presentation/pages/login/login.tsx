@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import Styles from './login-styles.scss';
 import { LoginHeader, FormStatus, Footer, Input, SubmitButton } from '../../components';
-import Context from '../../contexts/form/form-context';
+import { FormContext, ApiContext } from '../../contexts';
 import { Validation } from '../../protocols/validation';
 import { Authentication } from '../../../domain/usecases/authentication';
-import { UpdateCurrentAccount } from '../../../domain/usecases/update-current-account';
 
 type Props = {
   validation: Validation,
-  authentication: Authentication,
-  updateCurrentAccount: UpdateCurrentAccount
+  authentication: Authentication
 }
 
-const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccount }: Props) => {
+const Login: React.FC<Props> = ({ validation, authentication }: Props) => {
+  const { setCurrentAccount } = useContext(ApiContext);
   const history = useHistory();
   const [state, setState] = useState({
     isLoading: false,
@@ -52,7 +51,7 @@ const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccou
         email: state.email,
         password: state.password
       });
-      await updateCurrentAccount.save(account);
+      setCurrentAccount(account);
       history.replace('/');
     } catch (error) {
       setState({
@@ -66,7 +65,7 @@ const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccou
   return (
     <div className={Styles.loginWrap}>
       <LoginHeader />
-      <Context.Provider value={{ state, setState }}>
+      <FormContext.Provider value={{ state, setState }}>
         <form data-testid="form" className={Styles.form} onSubmit={handleSubmit}>
           <h2>Login</h2>
           <Input type="email" name="email" placeholder="Digite seu email" />
@@ -75,7 +74,7 @@ const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccou
           <Link to="/signup" data-testid="signup-link" className={Styles.link}>Criar conta</Link>
           <FormStatus />
         </form>
-      </Context.Provider>
+      </FormContext.Provider>
       <Footer />
     </div>
   )

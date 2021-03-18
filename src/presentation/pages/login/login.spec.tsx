@@ -2,38 +2,41 @@ import React from 'react';
 import faker from 'faker';
 import { Login } from '../';
 import { cleanup, fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
-import { ValidationStub, AuthenticationSpy, UpdateCurrentAccountMock, Helper } from '../../test';
+import { ValidationStub, AuthenticationSpy, Helper } from '../../test';
 import { InvalidCredentialsError } from '../../../domain/Error/invalid-credentials-error';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
+import { ApiContext } from '../../contexts';
+import { AccountModel } from '../../../domain/models/accountModel';
 
 type SutTypes = {
   sut: RenderResult,
   authenticationSpy: AuthenticationSpy,
-  updateCurrentAccountMock: UpdateCurrentAccountMock
+  setCurrentAccountMock: (account: AccountModel) => void
 }
 
 type SutParams = {
   validationError: string
 }
 
-const history = createMemoryHistory({ initialEntries:['/login'] });
+const history = createMemoryHistory({ initialEntries: ['/login'] });
 
 const makeSut = (params?: SutParams): SutTypes => {
   const validationStub = new ValidationStub();
   const authenticationSpy = new AuthenticationSpy();
   validationStub.errorMessage = params?.validationError;
-  const updateCurrentAccountMock = new UpdateCurrentAccountMock();
+  const setCurrentAccountMock = jest.fn();
   const sut = render(
-    <Router history={history}>
-      <Login
-        validation={validationStub}
-        authentication={authenticationSpy}
-        updateCurrentAccount={updateCurrentAccountMock}
-      />
-    </Router>
+    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
+      <Router history={history}>
+        <Login
+          validation={validationStub}
+          authentication={authenticationSpy}
+        />
+      </Router>
+    </ApiContext.Provider>
   );
-  return { sut, authenticationSpy, updateCurrentAccountMock };
+  return { sut, authenticationSpy, setCurrentAccountMock };
 }
 
 const simulateValidSubmit = async (sut: RenderResult, email = faker.internet.email(), password = faker.internet.password()): Promise<void> => {
@@ -127,20 +130,11 @@ describe('Login Component', () => {
   });
 
   test('Should call SaveAccessToken on sucess', async () => {
-    const { sut, authenticationSpy, updateCurrentAccountMock } = makeSut();
+    const { sut, authenticationSpy, setCurrentAccountMock } = makeSut();
     await simulateValidSubmit(sut);
-    expect(updateCurrentAccountMock.account).toEqual(authenticationSpy.account);
+    expect(setCurrentAccountMock).toHaveBeenCalledWith(authenticationSpy.account);
     expect(history.length).toBe(1);
     expect(history.location.pathname).toBe('/');
-  });
-
-  test('Should present error if SaveAccessToken fails', async () => {
-    const { sut, updateCurrentAccountMock } = makeSut();
-    const error = new InvalidCredentialsError();
-    jest.spyOn(updateCurrentAccountMock, 'save').mockReturnValueOnce(Promise.reject(error));
-    await simulateValidSubmit(sut);
-    Helper.testElementText(sut, 'main-error', error.message);
-    Helper.testChildCount(sut, 'error-wrap', 1);
   });
 
   test('Should go to signUp page', async () => {
