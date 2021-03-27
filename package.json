@@ -16,6 +16,7 @@
   "license": "ISC",
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.5.0",
+    "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^10.4.4",
     "@types/axios": "^0.14.0",
     "@types/faker": "^4.1.12",
