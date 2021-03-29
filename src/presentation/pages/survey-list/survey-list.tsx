@@ -1,42 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Styles from './survey-list-styles.scss';
-import { Footer, Header, Icon, IconName } from '../../components';
+import { Footer, Header } from '../../components';
+import { SurveyContext, SurveyListItem, SurveyError } from './components';
+import { LoadSurveyList } from '../../../domain/usecases/load-survey-list';
+import { SurveyModel } from '../../../domain/models/survey-model';
 
-const SurveyList: React.FC = () => {
+type Props = {
+  loadSurveyList: LoadSurveyList
+}
+
+const SurveyList: React.FC<Props> = ({ loadSurveyList }: Props) => {
+  const [state, setState] = useState({
+    surveyList: [] as SurveyModel[],
+    surveyError: '',
+    reload: false
+  });
+  useEffect(() => {
+    loadSurveyList.loadAll().then((surveys) => {
+      setState({ ...state, surveyList: surveys });
+    }).catch((err) => {
+      setState({ ...state, surveyError: err.message });
+    });
+  }, [state.reload]);
+
   return (
     <div className={Styles.surveyListWrap}>
       <Header />
       <div className={Styles.contentWrap}>
         <h2>Enquetes</h2>
-        <ul>
-          <li>
-            <div className={Styles.surveyContent}>
-              <Icon iconName={IconName.thumbDown} className={Styles.iconWrap} />
-              <time>
-                <span className={Styles.day}>22</span>
-                <span className={Styles.month}>03</span>
-                <span className={Styles.year}>2021</span>
-              </time>
-              <p>Qual é seu framework web favorito?</p>
-            </div>
-            <footer>Ver resultado</footer>
-          </li>
-          <li></li>
-          <li>
-            <div className={Styles.surveyContent}>
-              <Icon iconName={IconName.thumbDown} className={Styles.iconWrap} />
-              <time>
-                <span className={Styles.day}>22</span>
-                <span className={Styles.month}>03</span>
-                <span className={Styles.year}>2021</span>
-              </time>
-              <p>Qual é seu framework web favorito?</p>
-            </div>
-            <footer>Ver resultado</footer>
-          </li>
-          <li></li>
-          <li></li>
-        </ul>
+        <SurveyContext.Provider value={{ state, setState }} >
+          {!state.surveyError
+            ? <SurveyListItem />
+            : <SurveyError />
+          }
+        </SurveyContext.Provider>
       </div>
       <Footer />
     </div>
