@@ -6,13 +6,13 @@ import { AddAccountSpy } from '../../test';
 import { EmailInUseError } from '../../../domain/Error/email-in-use-error';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
-import { AccountModel } from '../../../domain/models/accountModel';
 import { ApiContext } from '../../contexts';
 import faker from 'faker';
+import { AddAccount } from '../../../domain/usecases/add-account';
 
 type SutTypes = {
   addAccountSpy: AddAccountSpy,
-  setCurrentAccountMock: (account: AccountModel) => void
+  setCurrentAccountMock: (account: AddAccount.Model) => void
 }
 
 type SutParams = {

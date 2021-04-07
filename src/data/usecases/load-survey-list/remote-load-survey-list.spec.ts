@@ -2,17 +2,16 @@ import { RemoteLoadSurveyList } from './remote-load-survey-list';
 import { HttpGetClientSpy } from '../../tests/mock-http';
 import { HttpStatusCode } from '../../protocols/http/http-response';
 import { UnexpectedError } from '../../../domain/Error/unexpected-error';
-import { SurveyModel } from '../../../domain/models/survey-model';
 import { MockSurveyListModel } from '../../../domain/test/mock-survey-list';
 import faker from 'faker';
 
 type SutTypes = {
   sut: RemoteLoadSurveyList,
-  httpGetClientSpy: HttpGetClientSpy<SurveyModel[]>
+  httpGetClientSpy: HttpGetClientSpy<RemoteLoadSurveyList.Model[]>
 };
 
 const makeSut = (url: string = faker.internet.url()): SutTypes => {
-    const httpGetClientSpy = new HttpGetClientSpy<SurveyModel[]>();
+    const httpGetClientSpy = new HttpGetClientSpy<RemoteLoadSurveyList.Model[]>();
     const sut = new RemoteLoadSurveyList(url, httpGetClientSpy);
     return {
       sut,

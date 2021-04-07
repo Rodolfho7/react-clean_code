@@ -7,11 +7,11 @@ import { InvalidCredentialsError } from '../../../domain/Error/invalid-credentia
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { ApiContext } from '../../contexts';
-import { AccountModel } from '../../../domain/models/accountModel';
+import { Authentication } from '../../../domain/usecases/authentication';
 
 type SutTypes = {
   authenticationSpy: AuthenticationSpy,
-  setCurrentAccountMock: (account: AccountModel) => void
+  setCurrentAccountMock: (account: Authentication.Model) => void
 }
 
 type SutParams = {
