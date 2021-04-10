@@ -4,6 +4,10 @@ import { SurveyList } from '../';
 import { LoadSurveyList } from '../../../domain/usecases/load-survey-list';
 import { MockSurveyListModel } from '../../../domain/test/mock-survey-list';
 import { UnexpectedError } from '../../../domain/Error/unexpected-error';
+import { createMemoryHistory } from 'history';
+import { Router } from 'react-router';
+import { ApiContext } from '../../contexts';
+import { mockAccountModel } from '../../../domain/test/mock-account';
 
 class LoadSurveyListSpy implements LoadSurveyList {
   callsCount = 0;
@@ -20,7 +24,13 @@ type SutTypes = {
 }
 
 const makeSut = (loadSurveyListSpy = new LoadSurveyListSpy()): SutTypes => {
-  render(<SurveyList loadSurveyList={loadSurveyListSpy} />);
+  render(
+    <ApiContext.Provider value={{ setCurrentAccount: jest.fn(), getCurrentAccount: () => mockAccountModel() }}>
+      <Router history={createMemoryHistory()}>
+        <SurveyList loadSurveyList={loadSurveyListSpy} />
+      </Router>
+    </ApiContext.Provider>
+  );
   return { loadSurveyListSpy };
 };
 
