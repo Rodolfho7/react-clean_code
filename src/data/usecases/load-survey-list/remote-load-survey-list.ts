@@ -2,6 +2,7 @@ import { HttpStatusCode } from '../../protocols/http/http-response';
 import { HttpGetClient } from '../../protocols/http/http-get-client';
 import { UnexpectedError } from '../../../domain/Error/unexpected-error';
 import { LoadSurveyList } from '../../../domain/usecases/load-survey-list';
+import { AccessDeniedError } from '../../../domain/Error/access-denied-error';
 
 export class RemoteLoadSurveyList implements LoadSurveyList {
   constructor(
@@ -19,6 +20,8 @@ export class RemoteLoadSurveyList implements LoadSurveyList {
         });
       case HttpStatusCode.noContent:
         return [];
+      case HttpStatusCode.forbidden:
+        throw new AccessDeniedError();
       default:
         throw new UnexpectedError();
     }
