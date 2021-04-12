@@ -29,12 +29,12 @@ const Login: React.FC<Props> = ({ validation, authentication }: Props) => {
     const formData = { email, password };
     const emailError = validation.validate('email', formData);
     const passwordError = validation.validate('password', formData);
-    setState({
-      ...state,
+    setState((oldState) => ({
+      ...oldState,
       emailError,
       passwordError,
       isFormInvalid: !!emailError || !!passwordError
-    });
+    }));
   }, [state.email, state.password]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -70,7 +70,7 @@ const Login: React.FC<Props> = ({ validation, authentication }: Props) => {
           <h2>Login</h2>
           <Input type="email" name="email" placeholder="Digite seu email" />
           <Input type="password" name="password" placeholder="Digite sua senha" />
-          <SubmitButton text="Cadastrar" />
+          <SubmitButton text="Logar" />
           <Link to="/signup" data-testid="signup-link" className={Styles.link}>Criar conta</Link>
           <FormStatus />
         </form>
