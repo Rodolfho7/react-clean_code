@@ -27,6 +27,8 @@ button {
   line-height: 50px;
   border: none;
   padding: 0 16px;
+  outline: none;
+
   &:hover {
     opacity: 0.9;
     cursor: pointer;
