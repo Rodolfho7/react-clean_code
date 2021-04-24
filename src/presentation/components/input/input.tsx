@@ -19,6 +19,7 @@ const Input: React.FC<Props> = (props: Props) => {
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     setState({
       ...state,
       [event.target.name]: event.target.value

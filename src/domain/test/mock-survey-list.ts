@@ -8,8 +8,10 @@ export const MockSurveyModel = (): LoadSurveyList.Model => ({
   didAnswer: faker.random.boolean()
 });
 
-export const MockSurveyListModel = (): LoadSurveyList.Model[] => ([
-  MockSurveyModel(),
-  MockSurveyModel(),
-  MockSurveyModel()
-]);
+export const MockSurveyListModel = (): LoadSurveyList.Model[] => {
+  return [
+    MockSurveyModel(),
+    MockSurveyModel(),
+    MockSurveyModel()
+  ]
+};
